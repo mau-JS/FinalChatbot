@@ -81,8 +81,10 @@ async function processDocument(projectId, location, processorId, filePath) {
 }
 
 app.post('/webhook', async (req, res) => {
+  // Extract the image URL from the incoming Facebook Messenger request
+  const url = req.body.originalDetectIntentRequest.payload.data.message.attachments[0].payload.url;
+
   const bucketName = 'mybucket124';  // TODO: replace with your bucket name
-  const url = 'https://drive.google.com/uc?export=download&id=1Hrwtmvb_fziWFEJ9iwfV_81mh0zvuMnf';  // TODO: replace with the URL of the file you want to download
   const destinationBlobName = 'test.pdf';  // TODO: replace with the name you want to give to the object in your bucket
   const destinationFilePath = './test.pdf';  // TODO: replace with the path where you want to download the file
   const projectId = 'documentprincipal';  // TODO: replace with your project ID
