@@ -81,6 +81,9 @@ async function processDocument(projectId, location, processorId, filePath) {
 }
 
 app.post('/webhook', async (req, res) => {
+  // Log the entire request body
+  console.log(req.body);
+
   // Extract the image URL from the incoming Facebook Messenger request
   const url = req.body.originalDetectIntentRequest.payload.data.message.attachments[0].payload.url;
 
@@ -99,7 +102,7 @@ app.post('/webhook', async (req, res) => {
 
   // Process the document
   const document = await processDocument(projectId, location, processorId, destinationFilePath);
-  console.log(document);
+  //console.log(document);
 
   // Extract entities from the document
   const entities = document.entities.map(entity => `${entity.type}: ${entity.mentionText}`);
