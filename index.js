@@ -73,6 +73,10 @@ async function processDocument(projectId, location, processorId, filePath) {
     rawDocument: rawDocument
   };
   const [result] = await documentaiClient.processDocument(request);
+
+  // Delete the file
+  fs.unlinkSync(filePath);
+
   return result.document;
 }
 
