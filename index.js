@@ -82,12 +82,29 @@ async function processDocument(projectId, location, processorId, filePath) {
   return result.document;
 }
 
+async function sendResponse(psid, pageId, messageText) {
+  const url = `https://graph.facebook.com/v13.0/me/messages?access_token=EAAKExSNuM4MBO93qB4qZCb2g29LfqLYnzn7i7U1qR2mVQNObgigpf9wmg4xnOa0zai9eYU7T1SRhcVKXohZAsA4DspXT5ecAIbySZCyblRBQYrCXNshf2gkjFHiuEKyNW0I7MIuXiHTFZCoPzfIDXei3meJ8gtX7wXxEbDpQKCHEwvCVYXx0JvgSYRreLVW3T75LxrQ6`;
+  const payload = {
+    recipient: {
+      id: psid
+    },
+    message: {
+      text: messageText
+    }
+  };
+
+  await axios.post(url, payload);
+}
+
 app.post('/webhook', async (req, res) => {
-  // Extract the payload from the incoming request
-  const payload = req.body.payload;
-  const data = payload.data;
-  const message = data.message;
+  // Extract the Facebook data from the incoming request
+  const facebookData = req.body.payload.data;
+  const senderId = facebookData.sender.id;
+  const pageId = facebookData.recipient.id;
+  const message = facebookData.message;
   const attachments = message.attachments;
+  console.log(facebookData)
+  console.log('Sender PSID:', senderId);
 
   // Loop through each attachment and log the URL
   attachments.forEach(async (attachment) => {
@@ -114,8 +131,12 @@ app.post('/webhook', async (req, res) => {
     const entities = document.entities.map(entity => `${entity.type}: ${entity.mentionText}`);
     console.log('Entities:', entities.join(', '));
 
-    res.sendStatus(200);
+    // Send a response back to the user
+    const messageText = `The entities in your document are: ${entities.join(', ')}`;
+    await sendResponse(senderId, pageId, messageText);
   });
+
+  res.sendStatus(200);
 });
 
 app.listen(3000, () => {
